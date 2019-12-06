@@ -1,4 +1,4 @@
-# TGStat API Client
+# TGStat API client
 
 Non official PHP client for TGStat API (https://tgstat.ru).
 

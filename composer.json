@@ -1,6 +1,6 @@
 {
   "name": "nullform/tgstat-client",
-  "description": "TGStat API Client",
+  "description": "TGStat API client",
   "type": "library",
   "keywords": ["tgstat", "tgstat.ru", "api", "client"],
   "homepage": "https://github.com/nullform/tgstat-client",
