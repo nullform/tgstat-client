@@ -35,6 +35,7 @@ class Error
         'quota_channel_reached'  => 'The quota for the number of unique channels per month has been exceeded',
         'quota_keywords_reached' => 'The quota for the number of Unique keywords per month has been exceeded',
         'quota_foreign_channel'  => 'On free tariff, you can request data only for channels that have passed the owner confirmation',
+        'invalid_phone'          => 'Invalid phone',
         'unknown_error'          => 'Unknown error',
     ];
 
