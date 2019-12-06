@@ -1,0 +1,23 @@
+{
+  "name": "nullform/tgstat-client",
+  "description": "TGStat API Client",
+  "type": "library",
+  "keywords": ["tgstat", "tgstat.ru", "api", "client"],
+  "homepage": "https://github.com/nullform/tgstat-client",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Pavel Novikov"
+    }
+  ],
+  "autoload": {
+    "psr-4": {"Nullform\\TGStatClient\\": "src/"}
+  },
+  "require": {
+    "php": ">=7.2",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "psr/cache": "^1.0.1",
+    "psr/simple-cache": "^1.0.1"
+  }
+}
