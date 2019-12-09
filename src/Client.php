@@ -382,7 +382,7 @@ class Client
         $this->request->user_agent = $this->userAgent();
         $this->request->timeout = $this->timeout();
 
-        $cache_key = $this->cache_prefix . md5(serialize($this->request));
+        $cache_key = $this->cache_prefix . $this->request->hash();
 
         $params_string = $params->toString();
         $endpoint = $this->baseUrl() . '/' . $path;

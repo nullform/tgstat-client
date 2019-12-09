@@ -69,4 +69,15 @@ class Request
      * @var string
      */
     public $body = '';
+
+
+    /**
+     * 32 byte hash of Request object.
+     *
+     * @return string
+     */
+    public function hash(): string
+    {
+        return md5(json_encode($this));
+    }
 }
