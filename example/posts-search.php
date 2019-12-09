@@ -37,4 +37,5 @@ try {
 
 }
 
+tgstat_client_request_info($client);
 tgstat_client_response_info($client);

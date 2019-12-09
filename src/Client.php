@@ -26,6 +26,13 @@ class Client
     public const DEFAULT_TIMEOUT = 10;
 
     /**
+     * Last request.
+     *
+     * @var Request|null
+     */
+    protected $request;
+
+    /**
      * The response of the last request.
      *
      * @var Response|null
@@ -89,6 +96,7 @@ class Client
     {
         $this->token = $token;
 
+        $this->request = new Request();
         $this->response = new Response();
     }
 
@@ -164,6 +172,16 @@ class Client
         }
 
         return $this->user_agent;
+    }
+
+    /**
+     * Get last request.
+     *
+     * @return Request
+     */
+    public function lastRequest(): Request
+    {
+        return $this->request;
     }
 
     /**
@@ -352,26 +370,25 @@ class Client
 
         $params->token = $this->token;
 
-        $cache_key = $this->cache_prefix .
-            md5(
-                serialize(
-                    [
-                        $http_method,
-                        $path,
-                        (array)$params,
-                        $this->sandbox()
-                    ]
-                )
-            );
+        $this->request = new Request(); // Reset last request
+        $this->response = new Response(); // Reset last response
+
+        // Make a new request...
+        $this->request->base_url = $this->baseUrl();
+        $this->request->method = strtoupper($http_method);
+        $this->request->path = $path;
+        $this->request->params = $params;
+        $this->request->sandbox = $this->sandbox();
+        $this->request->user_agent = $this->userAgent();
+        $this->request->timeout = $this->timeout();
+
+        $cache_key = $this->cache_prefix . md5(serialize($this->request));
 
         $params_string = $params->toString();
         $endpoint = $this->baseUrl() . '/' . $path;
         $allowed_http_methods = ['GET', 'POST'];
-        $http_method = strtoupper($http_method);
 
-        $this->response = new Response(); // Reset last response
-
-        if (!in_array($http_method, $allowed_http_methods)) {
+        if (!in_array($this->request->method, $allowed_http_methods)) {
             throw new Exceptions\CallException('HTTP method not alowed');
         }
 
@@ -393,7 +410,7 @@ class Client
             CURLOPT_USERAGENT      => $this->userAgent(),
         ];
 
-        if ($http_method === 'POST') {
+        if ($this->request->method === 'POST') {
             $curl_options[CURLOPT_POST] = true;
         }
 
