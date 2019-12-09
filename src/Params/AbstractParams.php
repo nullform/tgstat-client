@@ -24,6 +24,16 @@ abstract class AbstractParams
     }
 
     /**
+     * Parameters as associative array.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return (array)$this;
+    }
+
+    /**
      * Check if required parameters are passed.
      *
      * @param array $params Required parameters.
