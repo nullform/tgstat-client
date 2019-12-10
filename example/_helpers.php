@@ -31,7 +31,7 @@ if (!function_exists('tgstat_client_request_info')) {
         $output .= "  Sandbox: {$sandbox}\n";
 
         if (!empty($request->body)) {
-            $output .= "  Body: \n{$request->timeout}\n";
+            $output .= "  Body: \n{$request->body}\n";
         }
 
         if (php_sapi_name() != 'cli') {
