@@ -65,6 +65,14 @@ $params->strongSearch = 1;
 $mentions = $client->callWordsMentionsByChannels($params);
 ```
 
+### Last request info
+
+You can allways get last request instance by `Client::lastRequest()`.
+
+```php
+$request = $client->lastRequest();
+```
+
 ### Last response info
 
 You can allways get last response instance by `Client::lastResponse()`.
@@ -91,3 +99,22 @@ With repeated requests with the same parameters, the response will be taken from
 // Set PSR-6 or PSR-16 cache instance, TTL (60) and cache keys prefix (tgstat_client_)
 $client->caching($cache, 60, 'tgstat_client_');
 ```
+
+### Logging
+
+You can log your API calls by passing your own function to `Client::logFunction()`. Passed function will be called on every TGStat API call.
+The function takes an instance of `\Nullform\TGStatClient\Client` as a parameter.
+For example:
+
+```php
+$log_func = function (TGStatClient\Client $client) {
+    file_put_contents('tgstat-client-log.log', print_r($client->lastResponse(), true));
+};
+
+$client = new TGStatClient\Client($token);
+$client->logFunction($log_func);
+
+$stat = $client->callUsageStat();
+```
+
+Or you can just override the `Client::log()` method that is called on every TGStat API call.

@@ -88,6 +88,13 @@ class Client
      */
     protected $user_agent = 'nullform/tgstat-client';
 
+    /**
+     * The function for logging that will be executed on every API call.
+     *
+     * @var callable
+     */
+    protected $log_function;
+
 
     /**
      * @param string $token
@@ -172,6 +179,24 @@ class Client
         }
 
         return $this->user_agent;
+    }
+
+    /**
+     * The function for logging that will be called on every TGStat API call.
+     * Get or set value.
+     *
+     * The function takes a client instance as a parameter.
+     *
+     * @param callable|null $func
+     * @return callable
+     */
+    public function logFunction(?callable $func): callable
+    {
+        if (!is_null($func)) {
+            $this->log_function = $func;
+        }
+
+        return $this->log_function;
     }
 
     /**
@@ -370,10 +395,8 @@ class Client
 
         $params->token = $this->token;
 
-        $this->request = new Request(); // Reset last request
-        $this->response = new Response(); // Reset last response
-
         // Make a new request...
+        $this->request = new Request();
         $this->request->base_url = $this->baseUrl();
         $this->request->method = strtoupper($http_method);
         $this->request->path = $path;
@@ -384,46 +407,20 @@ class Client
 
         $cache_key = $this->cache_prefix . $this->request->hash();
 
-        $params_string = $params->toString();
-        $endpoint = $this->baseUrl() . '/' . $path;
-        $allowed_http_methods = ['GET', 'POST'];
-
-        if (!in_array($this->request->method, $allowed_http_methods)) {
-            throw new Exceptions\CallException('HTTP method not alowed');
-        }
-
         if (!is_null($this->cache)) {
             $cached_response = $this->getResponseFromCache($cache_key);
             if (!empty($cached_response) && $cached_response instanceof Response) {
+                // Get response from cache
                 $this->response = $cached_response;
                 $this->response->from_cache = true;
+                $this->log();
                 return $this->response;
             }
         }
 
-        $curl_options = [
-            CURLOPT_URL            => $endpoint . (!empty($params_string) ? '?' . $params_string : ''),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_TIMEOUT        => $this->timeout(),
-            CURLINFO_HEADER_OUT    => true,
-            CURLOPT_USERAGENT      => $this->userAgent(),
-        ];
+        $this->response = $this->request->send();
 
-        if ($this->request->method === 'POST') {
-            $curl_options[CURLOPT_POST] = true;
-        }
-
-        $ch = curl_init();
-
-        curl_setopt_array($ch, $curl_options);
-
-        $response_body = (string)curl_exec($ch);
-
-        $curl_info = curl_getinfo($ch);
-
-        $this->response->setResponseBody($response_body);
-        $this->response->setHttpStatus((int)$curl_info['http_code']);
+        $this->log();
 
         if ($this->response->status == Response::STATUS_ERROR || empty($this->response->status)) {
             if ($this->response->getError()) {
@@ -440,6 +437,18 @@ class Client
         }
 
         return $this->response;
+    }
+
+    /**
+     * Write TGStat API calls to log.
+     *
+     * The method can be overridden in your application to log any API calls.
+     *
+     * @return mixed
+     */
+    protected function log()
+    {
+        return is_callable($this->log_function) ? call_user_func($this->log_function, $this) : null;
     }
 
     /**
