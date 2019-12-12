@@ -23,16 +23,22 @@ final class Helpers
      * ```
      *
      * @param array $phrases
+     * @param bool $morphology
      * @return string
      */
-    public static function extendedSyntaxStrictPhrases(array $phrases): string
+    public static function extendedSyntaxStrictPhrases(array $phrases, bool $morphology = true): string
     {
         $query = '';
+        $nomorph = '';
+
+        if (!$morphology) {
+            $nomorph = '=';
+        }
 
         if (!empty($phrases)) {
             $phrases = array_map([self::class, 'extendedSyntaxCleanupString'], $phrases);
 
-            $query = '"' . implode('" | "', $phrases) . '"';
+            $query = $nomorph . '"' . implode('" | ' . $nomorph . '"', $phrases) . '"';
         }
 
         return $query;
