@@ -47,6 +47,8 @@ class Error
         if ($this->find($error_id)) {
             $this->error_id = $error_id;
             $this->message = $this->find($error_id);
+        } elseif (!empty($error_id)) {
+            $this->message = $error_id;
         }
     }
 
