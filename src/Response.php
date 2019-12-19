@@ -130,4 +130,14 @@ class Response
             }
         }
     }
+
+    /**
+     * Get response body.
+     *
+     * @return string
+     */
+    public function getResponseBody(): string
+    {
+        return $this->body;
+    }
 }

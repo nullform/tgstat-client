@@ -34,6 +34,16 @@ abstract class AbstractParams
     }
 
     /**
+     * Parameters as JSON string.
+     *
+     * @return string
+     */
+    public function toJson(): string
+    {
+        return json_encode($this, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
      * Check if required parameters are passed.
      *
      * @param array $params Required parameters.

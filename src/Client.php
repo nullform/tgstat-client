@@ -7,7 +7,12 @@ use Nullform\TGStatClient\Exceptions\CallException;
 use Nullform\TGStatClient\Exceptions\EmptyRequiredParamsException;
 use Nullform\TGStatClient\Exceptions\InvalidParamsException;
 use Nullform\TGStatClient\Exceptions\StatusPendingException;
+use Nullform\TGStatClient\Models\CallbackInfo;
 use Nullform\TGStatClient\Params\AbstractParams;
+use Nullform\TGStatClient\Params\CallbackSetCallbackURLParams;
+use Nullform\TGStatClient\Params\CallbackSubscribeChannelParams;
+use Nullform\TGStatClient\Params\CallbackSubscribeWordParams;
+use Nullform\TGStatClient\Params\CallbackSubscriptionsParams;
 use Nullform\TGStatClient\Params\FindUserByPhoneParams;
 use Nullform\TGStatClient\Params\PostsSearchParams;
 use Nullform\TGStatClient\Params\WordsMentionsByChannelsParams;
@@ -368,6 +373,195 @@ class Client
         }
 
         return $profile;
+    }
+
+    /**
+     * Setting callback URL.
+     *
+     * The method allows you to set the Callback URL to which you want to receive notifications about the occurrence
+     * of events of interest to you.
+     *
+     * If the callback URL is successfully verified, the method returns `true`. If the callback URL is set, but we were
+     * unable to verify it, the method will return a string with the verification code.
+     *
+     * @param CallbackSetCallbackURLParams $params
+     * @return bool|string
+     * @throws CacheFailException
+     * @throws CallException
+     * @throws EmptyRequiredParamsException
+     * @throws StatusPendingException
+     * @see https://api.beta.tgstat.ru/docs/ru/callback/set-callback-url.html
+     */
+    public function callCallbackSetCallbackURL(CallbackSetCallbackURLParams $params)
+    {
+        $verify_code = '';
+
+        $params->checkRequiredParams(['callback_url']);
+
+        try {
+
+            $this->call('POST', 'callback/set-callback-url', $params);
+
+        } catch (CallException $exception) {
+
+            $response = $this->lastResponse();
+
+            if (!empty($response)) { // Retrive verify_code from response body
+                $response_obj = @json_decode($response->getResponseBody());
+                if (!empty($response_obj->verify_code)) { // Response body is valid JSON and contains verify_code
+                    $verify_code = $response_obj->verify_code;
+                }
+            }
+
+            if (empty($verify_code)) { // We can't get verify_code from response
+                throw new CallException($exception->getMessage(), $exception->getCode());
+            }
+
+        }
+
+        return !empty($verify_code) ? $verify_code : true;
+    }
+
+    /**
+     * Get callback info.
+     *
+     * The method allows you to get information about the Callback URL set, errors that occur when accessing your
+     * Callback URL and the number of unsent messages in the queue.
+     *
+     * @return CallbackInfo|null
+     * @throws CacheFailException
+     * @throws CallException
+     * @throws StatusPendingException
+     * @see https://api.beta.tgstat.ru/docs/ru/callback/get-callback-info.html
+     */
+    public function callCallbackGetCallbackInfo(): ?CallbackInfo
+    {
+        $info = null;
+
+        $response = $this->call('GET', 'callback/get-callback-info');
+
+        $payload = $response->getPayload();
+
+        if (!empty($payload)) {
+            $info = new CallbackInfo($payload);
+        }
+
+        return $info;
+    }
+
+    /**
+     * Channel subscription.
+     *
+     * The method allows you to subscribe and receive notifications about the following events in the Telegram channel
+     * at the specified Callback URL: new publication, publication editing, publication removal.
+     *
+     * @param CallbackSubscribeChannelParams $params
+     * @return int|null Subscription ID
+     * @throws CacheFailException
+     * @throws CallException
+     * @throws EmptyRequiredParamsException
+     * @throws StatusPendingException
+     * @see https://api.beta.tgstat.ru/docs/ru/callback/subscribe-channel.html
+     */
+    public function callCallbackSubscribeChannel(CallbackSubscribeChannelParams $params): ?int
+    {
+        $subscription_id = null;
+
+        $params->checkRequiredParams(['channel_id', 'event_types']);
+
+        $response = $this->call('POST', 'callback/subscribe-channel', $params);
+
+        if ($response->getPayload()) {
+            $subscription_id = (int)$response->getPayload()->subscription_id;
+        }
+
+        return $subscription_id;
+    }
+
+    /**
+     * Keyword subscription.
+     *
+     * The method allows you to subscribe to a keyword (or phrase) and receive notifications on the appearance in the
+     * Telegram channels of new publications in which a given word occurs on the specified Callback URL.
+     *
+     * @param CallbackSubscribeWordParams $params
+     * @return int|null Subscription ID
+     * @throws CacheFailException
+     * @throws CallException
+     * @throws EmptyRequiredParamsException
+     * @throws StatusPendingException
+     * @see https://api.beta.tgstat.ru/docs/ru/callback/subscribe-word.html
+     */
+    public function callCallbackSubscribeWord(CallbackSubscribeWordParams $params): ?int
+    {
+        $subscription_id = null;
+
+        $params->checkRequiredParams(['q', 'event_types']);
+
+        $response = $this->call('POST', 'callback/subscribe-word', $params);
+
+        if ($response->getPayload()) {
+            $subscription_id = (int)$response->getPayload()->subscription_id;
+        }
+
+        return $subscription_id;
+    }
+
+    /**
+     * Get subscriptions list.
+     *
+     * The method allows you to get a list of your active subscriptions.
+     *
+     * @param CallbackSubscriptionsParams|null $params
+     * @return Models\Subscription[]
+     * @throws CacheFailException
+     * @throws CallException
+     * @throws StatusPendingException
+     * @see https://api.beta.tgstat.ru/docs/ru/callback/subscriptions-list.html
+     */
+    public function callCallbackSubscriptionsList(CallbackSubscriptionsParams $params = null): array
+    {
+        $subscriptions = [];
+
+        $response = $this->call('GET', 'callback/subscriptions-list', $params);
+
+        $payload = $response->getPayload();
+
+        if (is_object($payload) && is_array($payload->subscriptions)) {
+            foreach ($payload->subscriptions as $_subscription) {
+                $subscriptions[] = new Models\Subscription($_subscription);
+            }
+        }
+
+        return $subscriptions;
+    }
+
+    /**
+     * Unsubscribe.
+     *
+     * The method allows you to cancel a previously created subscription.
+     *
+     * @param int $subscription_id
+     * @return bool
+     * @throws CacheFailException
+     * @throws CallException
+     * @throws EmptyRequiredParamsException
+     * @throws StatusPendingException
+     * @see https://api.beta.tgstat.ru/docs/ru/callback/unsubscribe.html
+     */
+    public function callCallbackUnsubscribe(int $subscription_id): bool
+    {
+        $params = new class extends AbstractParams {
+            public $subscription_id = 0;
+        };
+
+        $params->subscription_id = $subscription_id;
+
+        $params->checkRequiredParams(['subscription_id']);
+
+        $this->call('POST', 'callback/unsubscribe', $params);
+
+        return true;
     }
 
     /**

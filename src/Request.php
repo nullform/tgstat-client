@@ -92,12 +92,13 @@ class Request
     public function send(): Response
     {
         $response = new Response();
-        $body = '';
-        $params_string = $this->params instanceof AbstractParams ? $this->params->toString() : '';
+        $request_body = '';
+        $response_body = '';
         $endpoint = $this->base_url . '/' . $this->path;
+        $headers = [];
 
         $curl_options = [
-            CURLOPT_URL            => $endpoint . (!empty($params_string) ? '?' . $params_string : ''),
+            CURLOPT_URL            => $endpoint,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_TIMEOUT        => $this->timeout,
@@ -105,19 +106,42 @@ class Request
             CURLOPT_USERAGENT      => $this->user_agent,
         ];
 
-        if ($this->method === 'POST') {
-            $curl_options[CURLOPT_POST] = true;
+        if ($this->method === 'POST' || $this->method === 'PUT') {
+
+            $curl_options[CURLOPT_CUSTOMREQUEST] = $this->method;
+
+            if ($this->method === 'POST') {
+                $curl_options[CURLOPT_POST] = true;
+            }
+
+            if (!empty($this->params)) {
+                $request_body = $this->params->toJson();
+                $headers[] = 'Content-Type: application/json';
+            }
+
+        } else {
+
+            $params_string = $this->params instanceof AbstractParams ? $this->params->toString() : '';
+            $curl_options[CURLOPT_URL] = $endpoint . (!empty($params_string) ? '?' . $params_string : '');
+
         }
+
+        if (!empty($request_body)) {
+            $curl_options[CURLOPT_POSTFIELDS] = $request_body;
+            $headers[] = 'Content-Length: ' . strlen($request_body);
+        }
+
+        $curl_options[CURLOPT_HTTPHEADER] = $headers;
 
         $ch = curl_init();
 
         curl_setopt_array($ch, $curl_options);
 
-        $body = (string)curl_exec($ch);
+        $response_body = (string)curl_exec($ch);
 
         $curl_info = curl_getinfo($ch);
 
-        $response->setResponseBody($body);
+        $response->setResponseBody($response_body);
         $response->setHttpStatus((int)$curl_info['http_code']);
 
         return $response;
