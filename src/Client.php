@@ -335,7 +335,11 @@ class Client
                 foreach ($channels as $_channel) {
                     if ($_channel->id == $item->channel_id) {
                         $item->channel = new Models\Channel($_channel);
-                        break;
+                    }
+                    if ($item->forwarded_from) {
+                        if ($_channel->id == $item->forwarded_from) {
+                            $item->forwarded_from_channel = new Models\Channel($_channel);
+                        }
                     }
                 }
                 $result[] = $item;

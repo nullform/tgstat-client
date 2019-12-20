@@ -53,6 +53,13 @@ class Post extends AbstractModel
     public $forwarded_from;
 
     /**
+     * Channel from which the repost is made. Null, if the message is not repost.
+     *
+     * @var Channel|null
+     */
+    public $forwarded_from_channel;
+
+    /**
      * Is the message deleted from Telegram (1 | 0).
      *
      * @var int
