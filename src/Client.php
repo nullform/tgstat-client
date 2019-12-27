@@ -404,7 +404,7 @@ class Client
 
         try {
 
-            $this->call('POST', 'callback/set-callback-url', $params);
+            $this->call('POST', 'callback/set-callback-url', $params, true);
 
         } catch (CallException $exception) {
 
@@ -473,7 +473,7 @@ class Client
 
         $params->checkRequiredParams(['channel_id', 'event_types']);
 
-        $response = $this->call('POST', 'callback/subscribe-channel', $params);
+        $response = $this->call('POST', 'callback/subscribe-channel', $params, true);
 
         if ($response->getPayload()) {
             $subscription_id = (int)$response->getPayload()->subscription_id;
@@ -502,7 +502,7 @@ class Client
 
         $params->checkRequiredParams(['q', 'event_types']);
 
-        $response = $this->call('POST', 'callback/subscribe-word', $params);
+        $response = $this->call('POST', 'callback/subscribe-word', $params, true);
 
         if ($response->getPayload()) {
             $subscription_id = (int)$response->getPayload()->subscription_id;
@@ -563,7 +563,7 @@ class Client
 
         $params->checkRequiredParams(['subscription_id']);
 
-        $this->call('POST', 'callback/unsubscribe', $params);
+        $this->call('POST', 'callback/unsubscribe', $params, true);
 
         return true;
     }
@@ -574,12 +574,18 @@ class Client
      * @param string              $http_method GET or POST
      * @param string              $path        Example: usage/stat
      * @param AbstractParams|null $params
+     * @param bool                $force_cache Don't use cache.
      * @return Response
      * @throws CallException
      * @throws CacheFailException
      * @throws StatusPendingException
      */
-    protected function call(string $http_method, string $path, ?AbstractParams $params = null): Response
+    protected function call(
+        string $http_method,
+        string $path,
+        ?AbstractParams $params = null,
+        bool $force_cache = false
+    ): Response
     {
         if (strpos($path, '/') === 0) {
             $path = substr($path, 1);
@@ -605,7 +611,7 @@ class Client
 
         $cache_key = $this->cache_prefix . $this->request->hash();
 
-        if (!is_null($this->cache)) {
+        if (!is_null($this->cache) && !$force_cache) {
             $cached_response = $this->getResponseFromCache($cache_key);
             if (!empty($cached_response) && $cached_response instanceof Response) {
                 // Get response from cache
