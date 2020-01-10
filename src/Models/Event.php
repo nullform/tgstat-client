@@ -57,4 +57,24 @@ class Event extends AbstractModel
      * @var Channel[]
      */
     public $channels = [];
+
+
+    /**
+     * @inheritDoc
+     */
+    public function fill(?\stdClass $obj): void
+    {
+        parent::fill($obj);
+
+        if (!empty($obj->post) && $obj->post instanceof \stdClass) {
+            $this->post = new Post($obj->post);
+        }
+        if (!empty($obj->channels) && is_array($obj->channels)) {
+            foreach ($obj->channels as $channel) {
+                if ($channel instanceof \stdClass) {
+                    $this->channels[] = new Channel($channel);
+                }
+            }
+        }
+    }
 }

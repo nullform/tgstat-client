@@ -44,4 +44,17 @@ class MentionsByChannelsItem extends AbstractModel
      * @var Channel
      */
     public $channel;
+
+
+    /**
+     * @inheritDoc
+     */
+    public function fill(?\stdClass $obj): void
+    {
+        parent::fill($obj);
+
+        if (!empty($obj->channel) && $obj->channel instanceof \stdClass) {
+            $this->channel = new Channel($obj->channel);
+        }
+    }
 }

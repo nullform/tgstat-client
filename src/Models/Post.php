@@ -95,4 +95,20 @@ class Post extends AbstractModel
      * @var Channel|null
      */
     public $channel;
+
+
+    /**
+     * @inheritDoc
+     */
+    public function fill(?\stdClass $obj): void
+    {
+        parent::fill($obj);
+
+        if (!empty($obj->channel) && $obj->channel instanceof \stdClass) {
+            $this->channel = new Channel($obj->channel);
+        }
+        if (!empty($obj->forwarded_from_channel) && $obj->forwarded_from_channel instanceof \stdClass) {
+            $this->forwarded_from_channel = new Channel($obj->forwarded_from_channel);
+        }
+    }
 }
