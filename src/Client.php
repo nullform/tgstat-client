@@ -350,6 +350,74 @@ class Client
     }
 
     /**
+     * Get information about Telegram publications - number of views, date of publication, content, etc...
+     *
+     * @param int|string $id t.me/username/123, t.me/c/1256804429/1230 or TGStat post ID.
+     * @return Models\Post|null
+     * @throws CacheFailException
+     * @throws CallException
+     * @throws EmptyRequiredParamsException
+     * @throws StatusPendingException
+     * @see https://api.tgstat.ru/docs/ru/posts/get.html
+     */
+    public function callPostsGet($id): ?Models\Post
+    {
+        $post = null;
+
+        $params = new class extends AbstractParams {
+            public $postId;
+        };
+
+        $params->postId = $id;
+
+        $params->checkRequiredParams(['postId']);
+
+        $response = $this->call('GET', 'posts/get', $params);
+
+        $payload = $response->getPayload();
+
+        if (is_object($payload)) {
+            $post = new Models\Post($payload);
+        }
+
+        return $post;
+    }
+
+    /**
+     * Get general information about the channel - link to the channel, name, description, avatar etc...
+     *
+     * @param int|string $id @username, t.me/username, t.me/joinchat/AAAAABbbbbcccc or TGStat channel ID.
+     * @return Models\Channel|null
+     * @throws CacheFailException
+     * @throws CallException
+     * @throws EmptyRequiredParamsException
+     * @throws StatusPendingException
+     * @see https://api.tgstat.ru/docs/ru/channels/get.html
+     */
+    public function callChannelsGet($id): ?Models\Channel
+    {
+        $channel = null;
+
+        $params = new class extends AbstractParams {
+            public $channelId;
+        };
+
+        $params->channelId = $id;
+
+        $params->checkRequiredParams(['channelId']);
+
+        $response = $this->call('GET', 'channels/get', $params);
+
+        $payload = $response->getPayload();
+
+        if (is_object($payload)) {
+            $channel = new Models\Channel($payload);
+        }
+
+        return $channel;
+    }
+
+    /**
      * Find Telegram users by phone number.
      *
      * @param FindUserByPhoneParams $params
