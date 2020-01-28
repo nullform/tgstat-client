@@ -66,6 +66,13 @@ class Client
     protected $cache_prefix = 'tgstat_client_';
 
     /**
+     * Use cache for the next request.
+     *
+     * @var bool
+     */
+    protected $use_cache = true;
+
+    /**
      * TGStat token.
      *
      * @var string
@@ -166,6 +173,19 @@ class Client
         $this->cache_prefix = $prefix;
 
         return !is_null($this->cache) ? true : false;
+    }
+
+    /**
+     * Should caching be used for the next request?
+     *
+     * @param bool $use
+     * @return $this
+     */
+    public function toggle_caching(bool $use = true): self
+    {
+        $this->use_cache = $use;
+
+        return $this;
     }
 
     /**
@@ -472,7 +492,7 @@ class Client
 
         try {
 
-            $this->call('POST', 'callback/set-callback-url', $params, true);
+            $this->call('POST', 'callback/set-callback-url', $params);
 
         } catch (CallException $exception) {
 
@@ -541,7 +561,7 @@ class Client
 
         $params->checkRequiredParams(['channel_id', 'event_types']);
 
-        $response = $this->call('POST', 'callback/subscribe-channel', $params, true);
+        $response = $this->call('POST', 'callback/subscribe-channel', $params);
 
         if ($response->getPayload()) {
             $subscription_id = (int)$response->getPayload()->subscription_id;
@@ -570,7 +590,7 @@ class Client
 
         $params->checkRequiredParams(['q', 'event_types']);
 
-        $response = $this->call('POST', 'callback/subscribe-word', $params, true);
+        $response = $this->call('POST', 'callback/subscribe-word', $params);
 
         if ($response->getPayload()) {
             $subscription_id = (int)$response->getPayload()->subscription_id;
@@ -631,7 +651,7 @@ class Client
 
         $params->checkRequiredParams(['subscription_id']);
 
-        $this->call('POST', 'callback/unsubscribe', $params, true);
+        $this->call('POST', 'callback/unsubscribe', $params);
 
         return true;
     }
@@ -642,18 +662,12 @@ class Client
      * @param string              $http_method GET or POST
      * @param string              $path        Example: usage/stat
      * @param AbstractParams|null $params
-     * @param bool                $force_cache Don't use cache.
      * @return Response
      * @throws CallException
      * @throws CacheFailException
      * @throws StatusPendingException
      */
-    protected function call(
-        string $http_method,
-        string $path,
-        ?AbstractParams $params = null,
-        bool $force_cache = false
-    ): Response
+    protected function call(string $http_method, string $path, ?AbstractParams $params = null): Response
     {
         if (strpos($path, '/') === 0) {
             $path = substr($path, 1);
@@ -679,13 +693,18 @@ class Client
 
         $cache_key = $this->cache_prefix . $this->request->hash();
 
-        if (!is_null($this->cache) && !$force_cache) {
+        if ($this->request->method != 'GET') {
+            $this->toggle_caching(false); // Forced switch off caching for non GET requests
+        }
+
+        if (!is_null($this->cache) && $this->use_cache) {
             $cached_response = $this->getResponseFromCache($cache_key);
             if (!empty($cached_response) && $cached_response instanceof Response) {
                 // Get response from cache
                 $this->response = $cached_response;
                 $this->response->from_cache = true;
                 $this->log();
+                $this->toggle_caching(true); // Switch on caching for the next request
                 return $this->response;
             }
         }
@@ -707,6 +726,8 @@ class Client
         if (!is_null($this->cache) && $this->response->status == Response::STATUS_OK) {
             $this->storeResponseToCache($cache_key);
         }
+
+        $this->toggle_caching(true); // Switch on caching for the next request
 
         return $this->response;
     }
