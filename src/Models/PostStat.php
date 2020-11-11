@@ -45,6 +45,10 @@ class PostStat extends AbstractModel
     {
         parent::fill($obj);
 
+        $this->viewsCount = (int)$obj->viewsCount;
+        $this->forwardsCount = (int)$obj->forwardsCount;
+        $this->mentionsCount = (int)$obj->mentionsCount;
+
         if (!empty($obj->forwards) && is_array($obj->forwards)) {
             foreach ($obj->forwards as $forward) {
                 $this->forwards[] = new PostForward($forward);
