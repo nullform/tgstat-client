@@ -404,6 +404,48 @@ class Client
     }
 
     /**
+     * Getting publication statistics.
+     *
+     * @param int|string $id
+     * @param bool $get_channels Get channel's info for every forwards.
+     * @return Models\PostStat
+     * @throws CacheFailException
+     * @throws CallException
+     * @throws EmptyRequiredParamsException
+     * @throws StatusPendingException
+     */
+    public function callPostsStat($id, bool $get_channels = false): Models\PostStat
+    {
+        $stat = null;
+
+        $params = new class extends AbstractParams {
+            public $postId;
+        };
+
+        $params->postId = $id;
+
+        $params->checkRequiredParams(['postId']);
+
+        $response = $this->call('GET', 'posts/stat', $params);
+
+        $payload = $response->getPayload();
+
+        if (is_object($payload)) {
+            $stat = new Models\PostStat($payload);
+        }
+
+        if ($get_channels && !empty($stat->forwards)) {
+            foreach ($stat->forwards as $forward) {
+                if ($forward->channelId) {
+                    $forward->channel = $this->callChannelsGet($forward->channelId);
+                }
+            }
+        }
+
+        return $stat;
+    }
+
+    /**
      * Get general information about the channel - link to the channel, name, description, avatar etc...
      *
      * @param int|string $id @username, t.me/username, t.me/joinchat/AAAAABbbbbcccc or TGStat channel ID.
