@@ -346,7 +346,7 @@ class Client
             $items = $response->getPayload()->items;
             $channels = [];
 
-            if (is_array($response->getPayload()->channels)) {
+            if (!empty($response->getPayload()->channels)) {
                 $channels = $response->getPayload()->channels;
             }
 
