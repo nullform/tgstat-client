@@ -4,8 +4,6 @@ namespace Nullform\TGStatClient;
 
 /**
  * Various helpers.
- *
- * @package Nullform\TGStatClient
  */
 final class Helpers
 {

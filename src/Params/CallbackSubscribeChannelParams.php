@@ -7,7 +7,6 @@ use Nullform\TGStatClient\Models\Event;
 /**
  * Channel subscription parameters.
  *
- * @package Nullform\TGStatClient
  * @see https://api.beta.tgstat.ru/docs/ru/callback/subscribe-channel.html
  */
 class CallbackSubscribeChannelParams extends AbstractParams

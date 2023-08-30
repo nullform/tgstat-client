@@ -5,7 +5,6 @@ namespace Nullform\TGStatClient\Models;
 /**
  * One repost.
  *
- * @package Nullform\TGStatClient
  * @see https://api.tgstat.ru/docs/ru/posts/stat.html
  */
 class PostForward extends AbstractModel

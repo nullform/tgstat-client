@@ -5,7 +5,6 @@ namespace Nullform\TGStatClient;
 /**
  * TGStat API error.
  *
- * @package Nullform\TGStatClient
  * @see https://api.tgstat.ru/docs/ru/errors.html
  */
 class Error

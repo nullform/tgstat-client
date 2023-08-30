@@ -5,7 +5,6 @@ namespace Nullform\TGStatClient\Models;
 /**
  * API Callback events.
  *
- * @package Nullform\TGStatClient
  * @see https://api.beta.tgstat.ru/docs/ru/objects/CallbackEvents.html
  */
 class Event extends AbstractModel

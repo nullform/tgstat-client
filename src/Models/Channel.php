@@ -5,7 +5,6 @@ namespace Nullform\TGStatClient\Models;
 /**
  * Information about the Telegram channel.
  *
- * @package Nullform\TGStatClient
  * @see https://api.tgstat.ru/docs/ru/objects/Channel.html
  */
 class Channel extends AbstractModel

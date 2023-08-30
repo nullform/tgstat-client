@@ -20,8 +20,6 @@ use Psr\SimpleCache\CacheInterface;
 
 /**
  * TGStat API client.
- *
- * @package Nullform\TGStatClient
  */
 class Client
 {

@@ -5,7 +5,6 @@ namespace Nullform\TGStatClient\Models;
 /**
  * Subscription keyword.
  *
- * @package Nullform\TGStatClient
  * @see https://api.beta.tgstat.ru/docs/ru/callback/subscriptions-list.html
  */
 class Keyword extends AbstractModel

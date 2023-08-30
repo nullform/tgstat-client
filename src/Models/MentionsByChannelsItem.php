@@ -5,7 +5,6 @@ namespace Nullform\TGStatClient\Models;
 /**
  * Mentioned keywords by channel.
  *
- * @package Nullform\TGStatClient
  * @see https://api.tgstat.ru/docs/ru/words/mentions-by-channels.html
  */
 class MentionsByChannelsItem extends AbstractModel

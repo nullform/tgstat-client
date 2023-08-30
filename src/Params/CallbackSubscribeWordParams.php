@@ -7,8 +7,6 @@ use Nullform\TGStatClient\Models\Event;
 
 /**
  * Keyword subscription parameters.
- *
- * @package Nullform\TGStatClient
  */
 class CallbackSubscribeWordParams extends AbstractParams
 {

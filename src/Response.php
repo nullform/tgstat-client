@@ -5,8 +5,7 @@ namespace Nullform\TGStatClient;
 /**
  * TGStat API response.
  *
- * @package Nullform\TGStatClient
- * @see     https://api.tgstat.ru/docs/
+ * @see https://api.tgstat.ru/docs/
  */
 class Response
 {

@@ -6,8 +6,6 @@ use Nullform\TGStatClient\Params\AbstractParams;
 
 /**
  * TGStat API request.
- *
- * @package Nullform\TGStatClient
  */
 class Request
 {

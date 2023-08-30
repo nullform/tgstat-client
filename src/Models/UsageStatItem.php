@@ -5,7 +5,6 @@ namespace Nullform\TGStatClient\Models;
 /**
  * The base class for the elements from the statistics of requests to the API.
  *
- * @package Nullform\TGStatClient
  * @see https://api.tgstat.ru/docs/ru/usage/stat.html
  */
 abstract class UsageStatItem extends AbstractModel

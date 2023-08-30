@@ -5,7 +5,6 @@ namespace Nullform\TGStatClient\Models;
 /**
  * Callback URL information.
  *
- * @package Nullform\TGStatClient
  * @see https://api.beta.tgstat.ru/docs/ru/callback/get-callback-info.html
  */
 class CallbackInfo extends AbstractModel

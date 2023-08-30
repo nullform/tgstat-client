@@ -5,7 +5,6 @@ namespace Nullform\TGStatClient\Models;
 /**
  * Events subscriptions.
  *
- * @package Nullform\TGStatClient
  * @see https://api.beta.tgstat.ru/docs/ru/callback/subscriptions-list.html
  */
 class Subscription extends AbstractModel

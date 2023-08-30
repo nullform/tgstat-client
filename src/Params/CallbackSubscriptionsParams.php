@@ -6,8 +6,6 @@ use Nullform\TGStatClient\Models\Subscription;
 
 /**
  * Parameters for subscriptions list.
- *
- * @package Nullform\TGStatClient
  */
 class CallbackSubscriptionsParams extends AbstractParams
 {

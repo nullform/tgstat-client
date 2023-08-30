@@ -5,8 +5,7 @@ namespace Nullform\TGStatClient\Params;
 /**
  * Parameters for finding publications.
  *
- * @package Nullform\TGStatClient
- * @see     https://api.tgstat.ru/docs/ru/posts/search.html
+ * @see https://api.tgstat.ru/docs/ru/posts/search.html
  */
 class PostsSearchParams extends AbstractParams
 {

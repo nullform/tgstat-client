@@ -5,7 +5,6 @@ namespace Nullform\TGStatClient\Models;
 /**
  * Publication statistics.
  *
- * @package Nullform\TGStatClient
  * @see https://api.tgstat.ru/docs/ru/posts/stat.html
  */
 class PostStat extends AbstractModel

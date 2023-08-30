@@ -7,8 +7,6 @@ use Nullform\TGStatClient\Exceptions\EmptyRequiredParamsException;
 
 /**
  * Base class for parameters.
- *
- * @package Nullform\TGStatClient\Params
  */
 abstract class AbstractParams
 {

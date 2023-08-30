@@ -5,7 +5,6 @@ namespace Nullform\TGStatClient\Models;
 /**
  * Telegram post item.
  *
- * @package Nullform\TGStatClient
  * @see https://api.tgstat.ru/docs/ru/objects/Post.html
  */
 class Post extends AbstractModel

@@ -4,8 +4,6 @@ namespace Nullform\TGStatClient\Models;
 
 /**
  * Search API access statistics.
- *
- * @package Nullform\TGStatClient
  */
 class UsageStatItemSearch extends UsageStatItem
 {

@@ -4,8 +4,6 @@ namespace Nullform\TGStatClient\Models;
 
 /**
  * The base class for all models used in the TGStat API.
- *
- * @package Nullform\TGStatClient
  */
 abstract class AbstractModel
 {
