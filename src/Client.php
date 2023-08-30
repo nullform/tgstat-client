@@ -13,7 +13,6 @@ use Nullform\TGStatClient\Params\CallbackSetCallbackURLParams;
 use Nullform\TGStatClient\Params\CallbackSubscribeChannelParams;
 use Nullform\TGStatClient\Params\CallbackSubscribeWordParams;
 use Nullform\TGStatClient\Params\CallbackSubscriptionsParams;
-use Nullform\TGStatClient\Params\FindUserByPhoneParams;
 use Nullform\TGStatClient\Params\PostsSearchParams;
 use Nullform\TGStatClient\Params\WordsMentionsByChannelsParams;
 use Psr\Cache\CacheItemPoolInterface;
@@ -172,7 +171,7 @@ class Client
         $this->cache_ttl = $ttl;
         $this->cache_prefix = $prefix;
 
-        return !is_null($this->cache) ? true : false;
+        return !is_null($this->cache);
     }
 
     /**
@@ -477,36 +476,6 @@ class Client
         }
 
         return $channel;
-    }
-
-    /**
-     * Find Telegram users by phone number.
-     *
-     * @param FindUserByPhoneParams $params
-     * @return Models\TelegramProfile|null If null, phone not registered.
-     * @throws CacheFailException
-     * @throws CallException
-     * @throws EmptyRequiredParamsException
-     * @throws StatusPendingException
-     */
-    public function callFindUserByPhone(FindUserByPhoneParams $params): ?Models\TelegramProfile
-    {
-        /**
-         * @var Models\TelegramProfile|null $result
-         */
-        $profile = null;
-
-        $params->checkRequiredParams(['phone']);
-
-        $response = $this->call('GET', 'tools/find-user-by-phone', $params);
-
-        $payload = $response->getPayload();
-
-        if (is_object($payload)) {
-            $profile = new Models\TelegramProfile($payload);
-        }
-
-        return $profile;
     }
 
     /**
