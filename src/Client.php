@@ -15,6 +15,7 @@ use Nullform\TGStatClient\Params\CallbackSubscribeWordParams;
 use Nullform\TGStatClient\Params\CallbackSubscriptionsParams;
 use Nullform\TGStatClient\Params\PostsSearchParams;
 use Nullform\TGStatClient\Params\WordsMentionsByChannelsParams;
+use Nullform\TGStatClient\Params\WordsMentionsByPeriodParams;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\SimpleCache\CacheInterface;
 
@@ -309,6 +310,41 @@ class Client
                     }
                 }
                 $result[] = $item;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * A method for tracking the dynamics of mentions and coverage of keywords or phrases.
+     *
+     * Suitable for monitoring mentions of a brand or person in Telegram publications.
+     * Returns the number of mentions and reach of a keyword for each day of the requested period.
+     *
+     * @param WordsMentionsByPeriodParams $params
+     * @return Models\MentionsByPeriodItem[]
+     * @throws CallException
+     * @throws CacheFailException
+     * @throws EmptyRequiredParamsException
+     * @see https://api.tgstat.ru/docs/ru/words/mentions-by-period.html
+     */
+    public function callWordsMentionsByPeriod(WordsMentionsByPeriodParams $params): array
+    {
+        /**
+         * @var Models\MentionsByPeriodItem[] $result
+         */
+        $result = [];
+
+        $params->checkRequiredParams(['q']);
+
+        $response = $this->call('GET', 'words/mentions-by-period', $params);
+
+        if (!empty($response->getPayload()->items)) {
+            $items = $response->getPayload()->items;
+
+            foreach ($items as $_item) {
+                $result[] = new Models\MentionsByPeriodItem($_item);
             }
         }
 
