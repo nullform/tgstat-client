@@ -31,6 +31,21 @@ class Post extends AbstractModel
     public $views = 0;
 
     /**
+     * @var int
+     */
+    public $shares_count = 0;
+
+    /**
+     * @var int
+     */
+    public $comments_count = 0;
+
+    /**
+     * @var int 
+     */
+    public $reactions_count = 0;
+
+    /**
      * Telegram-link to the publication.
      *
      * @var string
@@ -64,6 +79,13 @@ class Post extends AbstractModel
      * @var int
      */
     public $is_deleted = 0;
+
+    /**
+     * Timestamp of the publication deletion date (null - if not deleted).
+     *
+     * @var null|int
+     */
+    public $deleted_at = null;
 
     /**
      * The full text of the publication.
